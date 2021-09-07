@@ -2,39 +2,53 @@ from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandHelp, CommandStart
 from database.database import session, Customer, Product, Organization
 from loader import dp
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.dispatcher.filters import Text
-from keyboards.default.product_menus import products_menu
+from keyboards.default import products_menu_uz, products_menu_eng
+from states.Customer_state import Customer_Form
+from database.database import session, Customer, Product, Organization, savat
 
 
-@dp.message_handler(Text(contains="🛍Заказать", ignore_case=True))
+@dp.message_handler(Text(equals="🛍Заказать", ignore_case=True))
 async def order_handler(message: types.Message):
     user_id = message.from_user.id
-    customer = session.query(Customer).filter(Customer.id == user_id).first()
-    ordered_products = customer.ordered_products.all()
-    if len(ordered_products) == 0:
-        await message.answer("С чего начнем?", reply_markup=products_menu) # productlar ro'yxatini chiqar
-    else:
-        # Location ni olish kerak
-        text = "Sizning buyurtmalaringiz : \n"
-        i = 1
-        for p in ordered_products:
-            text += f"{i}. {p.title}\nMiqdor: {p.amount}\n"
-        text += f"Umumiy to'lov : {customer.get_total_price}"    
-        await message.answer(text)
+    products = session.query(Product).all()
+    titles = [p.title for p in products]
+    titles.append("⬅️Назад")
+    products_menu_eng = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton("📥Корзина"),
+                KeyboardButton("🚖Оформить заказ"),
+            ],
+        ],
+        row_width=2,
+        resize_keyboard=True,
+    )
+    products_menu_eng.add(*(KeyboardButton(title) for title in titles))
+    await message.answer("💫 С чего начнём?", reply_markup=products_menu_eng) # productlar ro'yxatini chiqar
+    await Customer_Form.product.set()
 
 
-@dp.message_handler(Text(contains="🛍Buyurtma berish", ignore_case=True))
+
+@dp.message_handler(Text(equals="🛍Buyurtma berish", ignore_case=True))
 async def order_handler(message: types.Message):
     user_id = message.from_user.id
-    customer = session.query(Customer).filter(Customer.id == user_id).first()
-    ordered_products = customer.ordered_products.all()
-    if len(ordered_products) == 0:
-        await message.answer("Qayerdan boshlaymiz?", reply_markup=products_menu) # productlar ro'yxatini chiqar
-    else:
-        # Location ni olish kerak
-        text = "Sizning buyurtmalaringiz : \n"
-        i = 1
-        for p in ordered_products:
-            text += f"{i}. {p.title}\nMiqdor: {p.amount}\n"
-        text += f"Umumiy to'lov : {customer.get_total_price}"    
-        await message.answer(text)
+    products = session.query(Product).all()
+    titles = [p.title for p in products]
+    titles.append("⬅️Ortga")
+    products_menu_uz = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton("📥Savat"),
+                KeyboardButton("🚖Buyurtma berish"),
+            ],
+        ],
+        row_width=2,
+        resize_keyboard=True,
+    )
+    products_menu_uz.add(*(KeyboardButton(title) for title in titles))
+    await message.answer("💫 Nimadan boshlaymiz?", reply_markup=products_menu_uz) # productlar ro'yxatini chiqar
+    await Customer_Form.product.set()
+
+    

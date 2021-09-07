@@ -6,7 +6,7 @@ menuStart = ReplyKeyboardMarkup(
 			KeyboardButton(text="🇺🇿O'zbekcha"),
 		],
 		[
-			KeyboardButton(text="🇬🇧English")
+			KeyboardButton(text="🇷🇺Русский")
 		]
 	], 
 	one_time_keyboard=True,

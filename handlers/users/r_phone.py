@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.builtin import CommandStart
 from loader import dp, bot
-# from keyboards.default.phone import phone_uz, phone_eng
+# from keyboards.default import phone_uz, phone_eng
 
 
 @dp.message_handler(content_types=["photo"])
